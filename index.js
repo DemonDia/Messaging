@@ -19,7 +19,6 @@ const connection = mysql.createConnection({
 });
 
 app.get("/", (req, res) => {
-    console.log("OK");
     res.json("OK");
 });
 
@@ -28,7 +27,30 @@ app.get("/messages", async (req, res) => {
         .promise()
         .query(`SELECT * from messages`)
         .then(([rows, fields]) => {
-            console.log("results", rows);
+            res.send({
+                success: true,
+                data: rows,
+            });
+        })
+        .catch((err) => {
+            res.send({
+                success: false,
+                message: err,
+            });
+        });
+});
+
+app.get("/messages/:id", async (req, res) => {
+    await connection
+        .promise()
+        .query(`SELECT * from messages where message_id = ${req.params.id}`)
+        .then(([rows, fields]) => {
+            if (rows.length == 0) {
+                res.send({
+                    success: false,
+                    message: "Message not found",
+                });
+            }
             res.send({
                 success: true,
                 data: rows,
