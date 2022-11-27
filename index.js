@@ -106,22 +106,20 @@ sender_name,
             ]
         )
         .then(async ([rows, fields]) => {
-            await transporter
-                .sendMail({
-                    from: `"Portfolio Site" ${process.env.TRANSPORTER_AUTH_USER}`, // sender address
-                    to: process.env.RECEIVER_EMAIL, // list of receivers
-                    subject: `[Message from site]${req.body.messageTitle}`, // Subject line
-                    // text: "Hello world?", // plain text body
-                    html: `<p>The user, ${req.body.senderName}, has sent you the following message:</p>
+            transporter.sendMail({
+                from: `"Portfolio Site" ${process.env.TRANSPORTER_AUTH_USER}`, // sender address
+                to: process.env.RECEIVER_EMAIL, // list of receivers
+                subject: `[Message from site]${req.body.messageTitle}`, // Subject line
+                // text: "Hello world?", // plain text body
+                html: `<p>The user, ${req.body.senderName}, has sent you the following message:</p>
                 <p>${req.body.messageContent}</p>
                 <p>Please get back by replying to this email ASAP: ${req.body.senderEmail}</p>`, // html body
-                })
-                .then(() => {
-                    res.send({
-                        success: true,
-                        data: rows.insertId,
-                    });
-                });
+            });
+
+            res.send({
+                success: true,
+                data: rows.insertId,
+            });
         })
         .catch((err) => {
             res.send({
