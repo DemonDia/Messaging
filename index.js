@@ -18,6 +18,17 @@ const connection = mysql.createConnection({
     database: process.env.DB_NAME,
 });
 
+// ==================nodemailer==================
+const nodemailer = require("nodemailer");
+
+let transporter = nodemailer.createTransport({
+    service: "outlook",
+    auth: {
+        user: process.env.TRANSPORTER_AUTH_USER, // generated ethereal user
+        pass: process.env.TRANSPORTER_AUTH_PASSWORD, // generated ethereal password
+    },
+});
+
 app.get("/", (req, res) => {
     res.json("OK");
 });
@@ -50,7 +61,7 @@ app.get("/messages/:id", async (req, res) => {
                     success: false,
                     message: "Message not found",
                 });
-                return
+                return;
             }
             res.send({
                 success: true,
@@ -94,11 +105,23 @@ sender_name,
                 0,
             ]
         )
-        .then(([rows, fields]) => {
-            res.send({
-                success: true,
-                data: rows.insertId,
-            });
+        .then(async ([rows, fields]) => {
+            await transporter
+                .sendMail({
+                    from: `"Portfolio Site" ${process.env.TRANSPORTER_AUTH_USER}`, // sender address
+                    to: process.env.RECEIVER_EMAIL, // list of receivers
+                    subject: `[Message from site]${messageTitle}`, // Subject line
+                    // text: "Hello world?", // plain text body
+                    html: `<p>The user, ${req.body.messageTitle}, has sent you the following message:</p>
+                <p>${req.body.messageContent}</p>
+                <p>Please get back by replying to this email ASAP: ${req.body.senderEmail}</p>`, // html body
+                })
+                .then((result) => {
+                    res.send({
+                        success: true,
+                        data: rows.insertId,
+                    });
+                });
         })
         .catch((err) => {
             res.send({
@@ -120,7 +143,7 @@ app.put("/messages/:id", async (req, res) => {
                     success: false,
                     message: "Message not found",
                 });
-                return
+                return;
             }
             res.send({
                 success: true,
@@ -138,16 +161,14 @@ app.put("/messages/:id", async (req, res) => {
 app.delete("/messages/:id", async (req, res) => {
     await connection
         .promise()
-        .query(
-            `DELETE FROM messages WHERE message_id = ${req.params.id}`
-        )
+        .query(`DELETE FROM messages WHERE message_id = ${req.params.id}`)
         .then(([rows, fields]) => {
             if (rows.affectedRows == 0) {
                 res.send({
                     success: false,
                     message: "Message not found",
                 });
-                return
+                return;
             }
             res.send({
                 success: true,
