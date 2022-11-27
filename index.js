@@ -116,7 +116,7 @@ sender_name,
                 <p>${req.body.messageContent}</p>
                 <p>Please get back by replying to this email ASAP: ${req.body.senderEmail}</p>`, // html body
                 })
-                .then((result) => {
+                .then(() => {
                     res.send({
                         success: true,
                         data: rows.insertId,
