@@ -64,31 +64,6 @@ app.get("/messages/:id", async (req, res) => {
         });
 });
 
-app.put("/messages/:id", async (req, res) => {
-    await connection
-        .promise()
-        .query(`UPDATE messages SET message_status = ${req.body.status} where message_id = ${req.params.id}`)
-        .then(([rows, fields]) => {
-            if (rows.affectedRows == 0) {
-                res.send({
-                    success: false,
-                    message: "Message not found",
-                });
-            }
-            res.send({
-                success: true,
-                message: "Success",
-            });
-        })
-        .catch((err) => {
-            res.send({
-                success: false,
-                message: err,
-            });
-        });
-});
-
-
 app.post("/messages", async (req, res) => {
     var date = new Date();
     await connection
@@ -122,6 +97,58 @@ sender_name,
             res.send({
                 success: true,
                 data: rows.insertId,
+            });
+        })
+        .catch((err) => {
+            res.send({
+                success: false,
+                message: err,
+            });
+        });
+});
+
+app.put("/messages/:id", async (req, res) => {
+    await connection
+        .promise()
+        .query(
+            `UPDATE messages SET message_status = ${req.body.status} where message_id = ${req.params.id}`
+        )
+        .then(([rows, fields]) => {
+            if (rows.affectedRows == 0) {
+                res.send({
+                    success: false,
+                    message: "Message not found",
+                });
+            }
+            res.send({
+                success: true,
+                message: "Updated",
+            });
+        })
+        .catch((err) => {
+            res.send({
+                success: false,
+                message: err,
+            });
+        });
+});
+
+app.delete("/messages/:id", async (req, res) => {
+    await connection
+        .promise()
+        .query(
+            `DELETE FROM messages WHERE message_id = ${req.params.id}`
+        )
+        .then(([rows, fields]) => {
+            if (rows.affectedRows == 0) {
+                res.send({
+                    success: false,
+                    message: "Message not found",
+                });
+            }
+            res.send({
+                success: true,
+                message: "Deleted",
             });
         })
         .catch((err) => {
