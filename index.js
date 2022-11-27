@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 app.get("/messages", async (req, res) => {
     await connection
         .promise()
-        .query("SELECT * from messages")
+        .query(`SELECT * from messages`)
         .then(([rows, fields]) => {
             console.log("results", rows);
             res.send({
@@ -40,7 +40,49 @@ app.get("/messages", async (req, res) => {
                 message: err,
             });
         });
-    console.log("get all");
+});
+
+app.post("/messages", async (req, res) => {
+    var date = new Date();
+    await connection
+        .promise()
+        .query(
+            `INSERT INTO messages
+        (
+        message_date,
+sender_name,
+        sender_contact,
+        message_title,
+        message_content,
+        message_status)
+        VALUES(
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?);`,
+            [
+                date.toISOString().slice(0, 19).replace("T", " "),
+                req.body.senderName,
+                req.body.senderEmail,
+                req.body.messageTitle,
+                req.body.messageContent,
+                0,
+            ]
+        )
+        .then(([rows, fields]) => {
+            res.send({
+                success: true,
+                data: rows.insertId,
+            });
+        })
+        .catch((err) => {
+            res.send({
+                success: false,
+                message: err,
+            });
+        });
 });
 
 app.listen(3000);
