@@ -50,6 +50,7 @@ app.get("/messages/:id", async (req, res) => {
                     success: false,
                     message: "Message not found",
                 });
+                return
             }
             res.send({
                 success: true,
@@ -119,6 +120,7 @@ app.put("/messages/:id", async (req, res) => {
                     success: false,
                     message: "Message not found",
                 });
+                return
             }
             res.send({
                 success: true,
@@ -145,6 +147,7 @@ app.delete("/messages/:id", async (req, res) => {
                     success: false,
                     message: "Message not found",
                 });
+                return
             }
             res.send({
                 success: true,
