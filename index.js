@@ -22,7 +22,8 @@ const connection = mysql.createConnection({
 const nodemailer = require("nodemailer");
 
 let transporter = nodemailer.createTransport({
-    service: "outlook",
+    service: "gmail",
+    // service: "outlook",
     auth: {
         user: process.env.TRANSPORTER_AUTH_USER, // generated ethereal user
         pass: process.env.TRANSPORTER_AUTH_PASSWORD, // generated ethereal password
